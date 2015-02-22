@@ -1,27 +1,45 @@
 CodeBook for Getting and Cleaning Data - Course Project
 ========================================================
 
+## The dataset includes the following files:
+- 'README.txt'
 
-```r
-summary(cars)
-```
+- 'features_info.txt': Shows information about the variables used on the feature vector.
 
-```
-##      speed           dist       
-##  Min.   : 4.0   Min.   :  2.00  
-##  1st Qu.:12.0   1st Qu.: 26.00  
-##  Median :15.0   Median : 36.00  
-##  Mean   :15.4   Mean   : 42.98  
-##  3rd Qu.:19.0   3rd Qu.: 56.00  
-##  Max.   :25.0   Max.   :120.00
-```
+- 'features.txt': List of all features.
 
-You can also embed plots, for example:
+- 'activity_labels.txt': Links the class labels with their activity name.
 
+- 'train/X_train.txt': Training set.
 
-```r
-plot(cars)
-```
+- 'train/y_train.txt': Training labels.
 
-![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png) 
+- 'test/X_test.txt': Test set.
 
+- 'test/y_test.txt': Test labels.
+
+The following files are available for the train and test data. Their descriptions are equivalent. 
+
+- 'train/subject_train.txt': Each row identifies the subject who performed the activity for each window sample. Its range is from 1 to 30. 
+
+- 'train/Inertial Signals/total_acc_x_train.txt': The acceleration signal from the smartphone accelerometer X axis in standard gravity units 'g'. Every row shows a 128 element vector. The same description applies for the 'total_acc_x_train.txt' and 'total_acc_z_train.txt' files for the Y and Z axis. 
+
+- 'train/Inertial Signals/body_acc_x_train.txt': The body acceleration signal obtained by subtracting the gravity from the total acceleration. 
+
+- 'train/Inertial Signals/body_gyro_x_train.txt': The angular velocity vector measured by the gyroscope for each window sample. The units are radians/second. 
+
+## File Inter-relationships :
+FileName              |       RowData               |   ColumnData
+---------             | --------                    | -----------
+X_train/X_test        | Observations                | 561 Features
+features              | Feature Name                | For 561 features
+y_train/y_test        | ActivityID                  | For all observations
+activity_labels       | Activity Names              | For all Activity IDs
+subject_train/test    | SubjectID                   | For all observations
+
+## For each record it is provided:
+- Triaxial acceleration from the accelerometer (total acceleration) and the estimated body acceleration.
+- Triaxial Angular velocity from the gyroscope. 
+- A 561-feature vector with time and frequency domain variables. 
+- Its activity label. 
+- An identifier of the subject who carried out the experiment.
