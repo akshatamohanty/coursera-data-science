@@ -1,3 +1,6 @@
+library(plyr)
+library(knitr)
+setwd("C:/GitHub/GCD_CourseProject/")
 ##  Unzips the downloaded file in the directory
 unzip("getdata-projectfiles-UCI HAR Dataset.zip")
 

@@ -1,4 +1,4 @@
-CodeBook for Getting and Cleaning Data - Course Project
+__CodeBook for Getting and Cleaning Data - Course Project__
 ========================================================
 
 ## The dataset includes the following files:
