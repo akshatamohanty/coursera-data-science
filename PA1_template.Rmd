@@ -102,7 +102,7 @@ no_of_incomplete_cases <- nrow(data) - sum(complete.cases(data))
 ```
 * Number of incomplete rows are `r no_of_incomplete_cases` out of `r nrow(data)` observations
 
-### Creating new data set with filled in values
+#### Creating new data set with filled in values
 * Strategy :
   * Replace NA values of incomplete cases with Mean of the number of steps for that interval 
   * If Mean of the number of steps is NaN, it will again result in incomplete cases. These are replaced by 0
@@ -184,11 +184,11 @@ xyplot(mean_steps ~ interval | day_of_week,
        scales=list(
           x=list(
                   at=seq(1,288,10), 
-                  labels=weekdata$interval[seq(1,288,10)]
+                  labels=weekdata$interval[seq(1,576,20)]
     )))
 ```
 
 * Inferences from the above plot :
   * The activity pattern remains somewhat similar with peaks and drops within the same interval range
   * The number of steps on an average per interval is mostly lesser during the weekend.
-  * The increase in the number of steps is earlier during weekdays as compared to weekends i.e approximately 255th interval on weekdays and 355th interval on weekdays - around an hour later
+  * The increase in the number of steps is earlier during weekdays as compared to weekends i.e approximately 535th interval on weekdays and 635th interval on weekdays - around an hour later
