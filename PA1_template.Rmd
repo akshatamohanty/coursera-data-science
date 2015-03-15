@@ -24,16 +24,12 @@ summary_by_date <- ddply(data,~date,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
                          mean_steps_per_interval=mean(steps, na.rm=TRUE))
-summary_by_date$day <- weekdays(as.Date(summary_by_date$date))
 
 data$interval <- as.factor(data$interval)
 summary_by_interval <- ddply(data,~interval,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
-                         mean_steps=mean(steps, na.rm=TRUE),
-                         standard_deviation=sd(steps, na.rm=TRUE), 
-                         maximum_steps=max(steps, na.rm=TRUE), 
-                         minimum_steps=min(steps, na.rm=TRUE))
+                         mean_steps=mean(steps, na.rm=TRUE))
 ```
 
 #### Summary of new data tables:
@@ -91,11 +87,11 @@ plot(as.numeric(summary_by_interval$interval), summary_by_interval$mean,
      ylab = "Average Number of Steps (over all days)",
      xaxt = "n", 
      yaxt = "n")
-axis(side=1, at=seq(1,288,4), labels=summary_by_interval$interval[seq(1,288,4)], cex.lab=0.25)
-axis(side=2, at=seq(0,250,15), labels=seq(0,250,15), cex.lab=0.25)
+axis(side=1, at=seq(1,288,4), labels=summary_by_interval$interval[seq(1,288,4)])
+axis(side=2, at=seq(0,250,15), labels=seq(0,250,15))
 abline(v=max_index, lwd=1, col="BLACK", lty=2)
 abline(h=max_steps, lwd=1, col="BLACK", lty=2)
-text(x=max_index+10, y=max_steps+4, labels=paste("(",max_interval,",",max_steps,")"), cex=0.9)
+text(x=max_index+10, y=max_steps+4, labels=paste("(",max_interval,",",max_steps,")"))
 ```
 
 ## Imputing missing values
@@ -122,16 +118,12 @@ new_summary_by_date <- ddply(newdata,~date,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
                          mean_steps_per_interval=mean(steps, na.rm=TRUE))
-new_summary_by_date$day <- weekdays(as.Date(new_summary_by_date$date))
 
 newdata$interval <- as.factor(newdata$interval)
 new_summary_by_interval <- ddply(newdata,~interval,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
-                         mean_steps=mean(steps, na.rm=TRUE),
-                         standard_deviation=sd(steps, na.rm=TRUE), 
-                         maximum_steps=max(steps, na.rm=TRUE), 
-                         minimum_steps=min(steps, na.rm=TRUE))
+                         mean_steps=mean(steps, na.rm=TRUE))
 ```
 
 #### Computing Mean and Median
@@ -163,6 +155,40 @@ legend("topright", legend=c("Mean", "Median"), col=c("BLACK", "BLACK"), lty=c(2,
 
 
 ## Are there differences in activity patterns between weekdays and weekends?
-```{r adding_weekdays, echo=TRUE}
+```{r adding_weekdays, echo=TRUE, fig.height=10, fig.width=18}
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+weekends <- c("Saturday", "Sunday")
+newdata$day_of_week <- weekdays(as.Date(newdata$date))
 
+# add a weekend/weekday column to newdata
+newdata[newdata$day_of_week %in% weekends,]$day_of_week <- "weekend"
+newdata[newdata$day_of_week %in% weekdays,]$day_of_week <- "weekday"
+
+# creating factor variable
+newdata$day_of_week <- as.factor(newdata$day_of_week)
+
+# summarising with respect to two factor variables
+weekdata <- ddply(newdata, .(interval, day_of_week), 
+                                      summarise,
+                                      total_steps=sum(steps, na.rm=TRUE),
+                                      mean_steps=round(mean(steps, na.rm=TRUE),2))  
+
+# lattice panel plot
+library(lattice)
+xyplot(mean_steps ~ interval | day_of_week, 
+       data = weekdata, 
+       layout = c(1,2), 
+       type = "l", 
+       ylab = "Number of Steps",
+       xlab = "Interval", 
+       scales=list(
+          x=list(
+                  at=seq(1,288,10), 
+                  labels=weekdata$interval[seq(1,288,10)]
+    )))
 ```
+
+* Inferences from the above plot :
+  * The activity pattern remains somewhat similar with peaks and drops within the same interval range
+  * The number of steps on an average per interval is mostly lesser during the weekend.
+  * The increase in the number of steps is earlier during weekdays as compared to weekends i.e approximately 255th interval on weekdays and 355th interval on weekdays - around an hour later

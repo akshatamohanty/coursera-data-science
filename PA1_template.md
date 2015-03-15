@@ -33,16 +33,12 @@ summary_by_date <- ddply(data,~date,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
                          mean_steps_per_interval=mean(steps, na.rm=TRUE))
-summary_by_date$day <- weekdays(as.Date(summary_by_date$date))
 
 data$interval <- as.factor(data$interval)
 summary_by_interval <- ddply(data,~interval,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
-                         mean_steps=mean(steps, na.rm=TRUE),
-                         standard_deviation=sd(steps, na.rm=TRUE), 
-                         maximum_steps=max(steps, na.rm=TRUE), 
-                         minimum_steps=min(steps, na.rm=TRUE))
+                         mean_steps=mean(steps, na.rm=TRUE))
 ```
 
 #### Summary of new data tables:
@@ -52,11 +48,10 @@ str(summary_by_date)
 ```
 
 ```
-## 'data.frame':	61 obs. of  4 variables:
+## 'data.frame':	61 obs. of  3 variables:
 ##  $ date                   : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 2 3 4 5 6 7 8 9 10 ...
 ##  $ total_steps            : int  0 126 11352 12116 13294 15420 11015 0 12811 9900 ...
 ##  $ mean_steps_per_interval: num  NaN 0.438 39.417 42.069 46.16 ...
-##  $ day                    : chr  "Monday" "Tuesday" "Wednesday" "Thursday" ...
 ```
 
 ```r
@@ -64,13 +59,10 @@ str(summary_by_interval)
 ```
 
 ```
-## 'data.frame':	288 obs. of  6 variables:
-##  $ interval          : Factor w/ 288 levels "0","5","10","15",..: 1 2 3 4 5 6 7 8 9 10 ...
-##  $ total_steps       : int  91 18 7 8 4 111 28 46 0 78 ...
-##  $ mean_steps        : num  1.717 0.3396 0.1321 0.1509 0.0755 ...
-##  $ standard_deviation: num  7.977 2.472 0.962 1.099 0.549 ...
-##  $ maximum_steps     : int  47 18 7 8 4 52 28 46 0 72 ...
-##  $ minimum_steps     : int  0 0 0 0 0 0 0 0 0 0 ...
+## 'data.frame':	288 obs. of  3 variables:
+##  $ interval   : Factor w/ 288 levels "0","5","10","15",..: 1 2 3 4 5 6 7 8 9 10 ...
+##  $ total_steps: int  91 18 7 8 4 111 28 46 0 78 ...
+##  $ mean_steps : num  1.717 0.3396 0.1321 0.1509 0.0755 ...
 ```
 
 ## What is mean total number of steps taken per day?
@@ -128,11 +120,11 @@ plot(as.numeric(summary_by_interval$interval), summary_by_interval$mean,
      ylab = "Average Number of Steps (over all days)",
      xaxt = "n", 
      yaxt = "n")
-axis(side=1, at=seq(1,288,4), labels=summary_by_interval$interval[seq(1,288,4)], cex.lab=0.25)
-axis(side=2, at=seq(0,250,15), labels=seq(0,250,15), cex.lab=0.25)
+axis(side=1, at=seq(1,288,4), labels=summary_by_interval$interval[seq(1,288,4)])
+axis(side=2, at=seq(0,250,15), labels=seq(0,250,15))
 abline(v=max_index, lwd=1, col="BLACK", lty=2)
 abline(h=max_steps, lwd=1, col="BLACK", lty=2)
-text(x=max_index+10, y=max_steps+4, labels=paste("(",max_interval,",",max_steps,")"), cex=0.9)
+text(x=max_index+10, y=max_steps+4, labels=paste("(",max_interval,",",max_steps,")"))
 ```
 
 ![plot of chunk timeseries](figure/timeseries-1.png) 
@@ -164,16 +156,12 @@ new_summary_by_date <- ddply(newdata,~date,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
                          mean_steps_per_interval=mean(steps, na.rm=TRUE))
-new_summary_by_date$day <- weekdays(as.Date(new_summary_by_date$date))
 
 newdata$interval <- as.factor(newdata$interval)
 new_summary_by_interval <- ddply(newdata,~interval,
                          summarise,
                          total_steps=sum(steps, na.rm=TRUE),
-                         mean_steps=mean(steps, na.rm=TRUE),
-                         standard_deviation=sd(steps, na.rm=TRUE), 
-                         maximum_steps=max(steps, na.rm=TRUE), 
-                         minimum_steps=min(steps, na.rm=TRUE))
+                         mean_steps=mean(steps, na.rm=TRUE))
 ```
 
 #### Computing Mean and Median
@@ -210,3 +198,42 @@ legend("topright", legend=c("Mean", "Median"), col=c("BLACK", "BLACK"), lty=c(2,
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
+```r
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+weekends <- c("Saturday", "Sunday")
+newdata$day_of_week <- weekdays(as.Date(newdata$date))
+
+# add a weekend/weekday column to newdata
+newdata[newdata$day_of_week %in% weekends,]$day_of_week <- "weekend"
+newdata[newdata$day_of_week %in% weekdays,]$day_of_week <- "weekday"
+
+# creating factor variable
+newdata$day_of_week <- as.factor(newdata$day_of_week)
+
+# summarising with respect to two factor variables
+weekdata <- ddply(newdata, .(interval, day_of_week), 
+                                      summarise,
+                                      total_steps=sum(steps, na.rm=TRUE),
+                                      mean_steps=round(mean(steps, na.rm=TRUE),2))  
+
+# lattice panel plot
+library(lattice)
+xyplot(mean_steps ~ interval | day_of_week, 
+       data = weekdata, 
+       layout = c(1,2), 
+       type = "l", 
+       ylab = "Number of Steps",
+       xlab = "Interval", 
+       scales=list(
+          x=list(
+                  at=seq(1,288,10), 
+                  labels=weekdata$interval[seq(1,288,10)]
+    )))
+```
+
+![plot of chunk adding_weekdays](figure/adding_weekdays-1.png) 
+
+* Inferences from the above plot :
+  * The activity pattern remains somewhat similar with peaks and drops within the same interval range
+  * The number of steps on an average per interval is mostly lesser during the weekend.
+  * The increase in the number of steps is earlier during weekdays as compared to weekends i.e approximately 255th interval on weekdays and 355th interval on weekdays - around an hour later
