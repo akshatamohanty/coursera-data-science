@@ -1,0 +1,194 @@
+---
+title: "Reproducible Research: Peer Assessment 1"
+output: 
+  html_document:
+    keep_md: true
+---
+
+# Reproducible Research: Peer Assessment 1
+
+=====================================================================
+
+## Loading and preprocessing the data
+
+#### Reading data
+```{r reading_data, echo = TRUE}
+data <- read.csv(unzip("activity.zip"))
+str(data)
+```
+
+#### Preprocessing data
+```{r preprocessing_data, echo=TRUE}
+library(plyr)
+summary_by_date <- ddply(data,~date,
+                         summarise,
+                         total_steps=sum(steps, na.rm=TRUE),
+                         mean_steps_per_interval=mean(steps, na.rm=TRUE))
+
+data$interval <- as.factor(data$interval)
+summary_by_interval <- ddply(data,~interval,
+                         summarise,
+                         total_steps=sum(steps, na.rm=TRUE),
+                         mean_steps=mean(steps, na.rm=TRUE))
+```
+
+#### Summary of new data tables:
+```{r summary, echo=TRUE}
+str(summary_by_date)
+str(summary_by_interval)
+```
+
+## What is mean total number of steps taken per day?
+
+#### Computing Mean and Median
+```{r Mean_Median, echo=TRUE}
+mean_of_steps_per_day <- round(mean(summary_by_date$total_steps, na.rm=TRUE), 2)
+median_of_steps_per_day <- median(summary_by_date$total_steps, na.rm=TRUE)
+```
+
+* Mean of total number of steps each day:  `r mean_of_steps_per_day` 
+* Median of total number of steps each day: `r median_of_steps_per_day`
+
+#### Histogram of Total Number of Steps each Day
+```{r hist_totalsteps, echo=TRUE, fig.height=10, fig.width=18}
+hist <- hist(summary_by_date$total_steps, 
+     main = "Histogram of Total Steps per Day", breaks=20,
+     xlab = "Total Steps each Day",
+     ylab = "Frequency (days)",
+     ylim = c(0,10),
+     col = "BLUE",
+     xaxt = "n")
+axis(side=1, at=seq(0, 22000, 1000), lab=seq(0, 22000, 1000))
+abline(v=mean_of_steps_per_day, col="BLACK", lty=2, lwd=2)
+abline(v=median_of_steps_per_day, col="BLACK", lty=3, lwd=2)
+legend("topright", legend=c("Mean", "Median"), col=c("BLACK", "BLACK"), lty=c(2,3), lwd=2)
+```
+
+## What is the average daily activity pattern?
+
+#### Finding interval with maximum steps on an average
+```{r max_steps_interval, echo = TRUE}
+max_steps <- round(max(summary_by_interval$mean), digits=2)
+max_index <- which.max(summary_by_interval$mean)
+max_interval <- summary_by_interval$interval[max_index]
+max_interval <- as.numeric(as.character(max_interval))
+```
+
+* The interval with the maximum number of steps is the `r max_interval`th interval with `r max_steps` steps everyday on an average
+
+#### Time Series Plot : Average Number of Steps(y) Vs. Interval(x)
+
+```{r timeseries, echo = TRUE, fig.height=10, fig.width=18}
+plot(as.numeric(summary_by_interval$interval), summary_by_interval$mean, 
+     type = "l", 
+     col = "BLUE",
+     main = "Average Steps per Interval", 
+     xlab = "Interval",
+     ylab = "Average Number of Steps (over all days)",
+     xaxt = "n", 
+     yaxt = "n")
+axis(side=1, at=seq(1,288,4), labels=summary_by_interval$interval[seq(1,288,4)])
+axis(side=2, at=seq(0,250,15), labels=seq(0,250,15))
+abline(v=max_index, lwd=1, col="BLACK", lty=2)
+abline(h=max_steps, lwd=1, col="BLACK", lty=2)
+text(x=max_index+10, y=max_steps+4, labels=paste("(",max_interval,",",max_steps,")"))
+```
+
+## Imputing missing values
+
+#### Computing total number of incomplete cases in the dataset
+```{r incompletecases, echo = TRUE}
+no_of_incomplete_cases <- nrow(data) - sum(complete.cases(data))
+```
+* Number of incomplete rows are `r no_of_incomplete_cases` out of `r nrow(data)` observations
+
+#### Creating new data set with filled in values
+* Strategy :
+  * Replace NA values of incomplete cases with Mean of the number of steps for that interval 
+  * If Mean of the number of steps is NaN, it will again result in incomplete cases. These are replaced by 0
+```{r newdataset, echo = TRUE}
+newdata <- data
+newdata[!complete.cases(newdata),]$steps <- round(summary_by_interval[!complete.cases(newdata),]$mean_steps,2)
+newdata[!complete.cases(newdata),]$steps <- 0
+```
+
+#### Preprocessing newdata
+```{r new_preprocessing_data, echo=TRUE}
+new_summary_by_date <- ddply(newdata,~date,
+                         summarise,
+                         total_steps=sum(steps, na.rm=TRUE),
+                         mean_steps_per_interval=mean(steps, na.rm=TRUE))
+
+newdata$interval <- as.factor(newdata$interval)
+new_summary_by_interval <- ddply(newdata,~interval,
+                         summarise,
+                         total_steps=sum(steps, na.rm=TRUE),
+                         mean_steps=mean(steps, na.rm=TRUE))
+```
+
+#### Computing Mean and Median
+```{r new_Mean_Median, echo=TRUE}
+new_mean_of_steps_per_day <- round(mean(new_summary_by_date$total_steps, na.rm=TRUE), 2)
+new_median_of_steps_per_day <- median(new_summary_by_date$total_steps, na.rm=TRUE)
+```
+
+* Mean of total number of steps each day:  `r new_mean_of_steps_per_day` 
+* Median of total number of steps each day: `r new_median_of_steps_per_day`  
+    * Mean shifts by `r -mean_of_steps_per_day + new_mean_of_steps_per_day` steps to the right
+    * Median shifts `r -median_of_steps_per_day + new_median_of_steps_per_day` steps to the right
+    * The distribution remains almost the same
+
+#### Histogram of Total Number of Steps each Day using Filled-In Data
+```{r new_hist_totalsteps, echo=TRUE, fig.height=10, fig.width=18}
+newhist <- hist(new_summary_by_date$total_steps, 
+     main = "Histogram of Total Steps per Day Using Filled In Data", breaks=20,
+     xlab = "Total Steps each Day",
+     ylab = "Frequency (days)",
+     ylim = c(0,10),
+     col = "BLUE",
+     xaxt = "n")
+axis(side=1, at=seq(0, 22000, 1000), lab=seq(0, 22000, 1000))
+abline(v=new_mean_of_steps_per_day, col="BLACK", lty=2, lwd=2)
+abline(v=new_median_of_steps_per_day, col="BLACK", lty=3, lwd=2)
+legend("topright", legend=c("Mean", "Median"), col=c("BLACK", "BLACK"), lty=c(2,3), lwd=2)
+```
+
+
+## Are there differences in activity patterns between weekdays and weekends?
+```{r adding_weekdays, echo=TRUE, fig.height=10, fig.width=18}
+weekdays <- c("Monday", "Tuesday", "Wednesday", "Thursday", "Friday")
+weekends <- c("Saturday", "Sunday")
+newdata$day_of_week <- weekdays(as.Date(newdata$date))
+
+# add a weekend/weekday column to newdata
+newdata[newdata$day_of_week %in% weekends,]$day_of_week <- "weekend"
+newdata[newdata$day_of_week %in% weekdays,]$day_of_week <- "weekday"
+
+# creating factor variable
+newdata$day_of_week <- as.factor(newdata$day_of_week)
+
+# summarising with respect to two factor variables
+weekdata <- ddply(newdata, .(interval, day_of_week), 
+                                      summarise,
+                                      total_steps=sum(steps, na.rm=TRUE),
+                                      mean_steps=round(mean(steps, na.rm=TRUE),2))  
+
+# lattice panel plot
+library(lattice)
+xyplot(mean_steps ~ interval | day_of_week, 
+       data = weekdata, 
+       layout = c(1,2), 
+       type = "l", 
+       ylab = "Number of Steps",
+       xlab = "Interval", 
+       scales=list(
+          x=list(
+                  at=seq(1,288,10), 
+                  labels=weekdata$interval[seq(1,576,20)]
+    )))
+```
+
+* Inferences from the above plot :
+  * The activity pattern remains somewhat similar with peaks and drops within the same interval range
+  * The number of steps on an average per interval is mostly lesser during the weekend.
+  * The increase in the number of steps is earlier during weekdays as compared to weekends i.e approximately 535th interval on weekdays and 635th interval on weekdays - around an hour later
