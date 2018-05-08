@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+
+<title><strong>CodeBook for Getting and Cleaning Data - Course Project</strong></title>
+
+<script type="text/javascript">
+window.onload = function() {
+  var imgs = document.getElementsByTagName('img'), i, img;
+  for (i = 0; i < imgs.length; i++) {
+    img = imgs[i];
+    // center an image if it is the only element of its parent
+    if (img.parentElement.childElementCount === 1)
+      img.parentElement.style.textAlign = 'center';
+  }
+};
+</script>
+
+
+
+
+
+<style type="text/css">
+body, td {
+   font-family: sans-serif;
+   background-color: white;
+   font-size: 13px;
+}
+
+body {
+  max-width: 800px;
+  margin: auto;
+  padding: 1em;
+  line-height: 20px;
+}
+
+tt, code, pre {
+   font-family: 'DejaVu Sans Mono', 'Droid Sans Mono', 'Lucida Console', Consolas, Monaco, monospace;
+}
+
+h1 {
+   font-size:2.2em;
+}
+
+h2 {
+   font-size:1.8em;
+}
+
+h3 {
+   font-size:1.4em;
+}
+
+h4 {
+   font-size:1.0em;
+}
+
+h5 {
+   font-size:0.9em;
+}
+
+h6 {
+   font-size:0.8em;
+}
+
+a:visited {
+   color: rgb(50%, 0%, 50%);
+}
+
+pre, img {
+  max-width: 100%;
+}
+pre {
+  overflow-x: auto;
+}
+pre code {
+   display: block; padding: 0.5em;
+}
+
+code {
+  font-size: 92%;
+  border: 1px solid #ccc;
+}
+
+code[class] {
+  background-color: #F8F8F8;
+}
+
+table, td, th {
+  border: none;
+}
+
+blockquote {
+   color:#666666;
+   margin:0;
+   padding-left: 1em;
+   border-left: 0.5em #EEE solid;
+}
+
+hr {
+   height: 0px;
+   border-bottom: none;
+   border-top-width: thin;
+   border-top-style: dotted;
+   border-top-color: #999999;
+}
+
+@media print {
+   * {
+      background: transparent !important;
+      color: black !important;
+      filter:none !important;
+      -ms-filter: none !important;
+   }
+
+   body {
+      font-size:12pt;
+      max-width:100%;
+   }
+
+   a, a:visited {
+      text-decoration: underline;
+   }
+
+   hr {
+      visibility: hidden;
+      page-break-before: always;
+   }
+
+   pre, blockquote {
+      padding-right: 1em;
+      page-break-inside: avoid;
+   }
+
+   tr, img {
+      page-break-inside: avoid;
+   }
+
+   img {
+      max-width: 100% !important;
+   }
+
+   @page :left {
+      margin: 15mm 20mm 15mm 10mm;
+   }
+
+   @page :right {
+      margin: 15mm 10mm 15mm 20mm;
+   }
+
+   p, h2, h3 {
+      orphans: 3; widows: 3;
+   }
+
+   h2, h3 {
+      page-break-after: avoid;
+   }
+}
+</style>
+
+
+
+</head>
+
+<body>
+<h1><strong>CodeBook for Getting and Cleaning Data - Course Project</strong></h1>
+
+<h2>The dataset includes the following files:</h2>
+
+<ul>
+<li><p>&#39;README.txt&#39;</p></li>
+<li><p>&#39;features_info.txt&#39;: Shows information about the variables used on the feature vector.</p></li>
+<li><p>&#39;features.txt&#39;: List of all features.</p></li>
+<li><p>&#39;activity_labels.txt&#39;: Links the class labels with their activity name.</p></li>
+<li><p>&#39;train/X_train.txt&#39;: Training set.</p></li>
+<li><p>&#39;train/y_train.txt&#39;: Training labels.</p></li>
+<li><p>&#39;test/X_test.txt&#39;: Test set.</p></li>
+<li><p>&#39;test/y_test.txt&#39;: Test labels.</p></li>
+</ul>
+
+<p>The following files are available for the train and test data. Their descriptions are equivalent. </p>
+
+<ul>
+<li><p>&#39;train/subject_train.txt&#39;: Each row identifies the subject who performed the activity for each window sample. Its range is from 1 to 30. </p></li>
+<li><p>&#39;train/Inertial Signals/total_acc_x_train.txt&#39;: The acceleration signal from the smartphone accelerometer X axis in standard gravity units &#39;g&#39;. Every row shows a 128 element vector. The same description applies for the &#39;total_acc_x_train.txt&#39; and &#39;total_acc_z_train.txt&#39; files for the Y and Z axis. </p></li>
+<li><p>&#39;train/Inertial Signals/body_acc_x_train.txt&#39;: The body acceleration signal obtained by subtracting the gravity from the total acceleration. </p></li>
+<li><p>&#39;train/Inertial Signals/body_gyro_x_train.txt&#39;: The angular velocity vector measured by the gyroscope for each window sample. The units are radians/second. </p></li>
+</ul>
+
+<h2>File Inter-relationships :</h2>
+
+<table><thead>
+<tr>
+<th>FileName</th>
+<th>RowData</th>
+<th>ColumnData</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>X_train/X_test</td>
+<td>Observations</td>
+<td>561 Features</td>
+</tr>
+<tr>
+<td>features</td>
+<td>Feature Name</td>
+<td>For 561 features</td>
+</tr>
+<tr>
+<td>y_train/y_test</td>
+<td>ActivityID</td>
+<td>For all observations</td>
+</tr>
+<tr>
+<td>activity_labels</td>
+<td>Activity Names</td>
+<td>For all Activity IDs</td>
+</tr>
+<tr>
+<td>subject_train/test</td>
+<td>SubjectID</td>
+<td>For all observations</td>
+</tr>
+</tbody></table>
+
+<h2>For each record it is provided:</h2>
+
+<ul>
+<li>Triaxial acceleration from the accelerometer (total acceleration) and the estimated body acceleration.</li>
+<li>Triaxial Angular velocity from the gyroscope. </li>
+<li>A 561-feature vector with time and frequency domain variables. </li>
+<li>Its activity label. </li>
+<li>An identifier of the subject who carried out the experiment.</li>
+</ul>
+
+</body>
+
+</html>
